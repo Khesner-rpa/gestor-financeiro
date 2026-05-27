@@ -43,6 +43,11 @@ public class Transacao {
     @Column(nullable = false, length = 20)
     private TipoTransacao tipo;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 40)
+    private CategoriaTransacao categoria;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
@@ -87,16 +92,19 @@ public class Transacao {
         this.tipo = tipo;
     }
 
+    public CategoriaTransacao getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(CategoriaTransacao categoria) {
+        this.categoria = categoria;
+    }
+
     public Usuario getUsuario() {
         return usuario;
     }
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
-    }
-
-    public enum TipoTransacao {
-        RECEITA,
-        DESPESA
     }
 }

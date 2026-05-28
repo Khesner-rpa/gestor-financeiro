@@ -1,5 +1,22 @@
 (function () {
     const storageKey = "gestor-financeiro-theme";
+    const maxBotMessageLength = 220;
+
+    const PANELS = {
+        dashboard: { title: "Dashboard", eyebrow: "Resumo do mes" },
+        planejamento: { title: "Metas e graficos", eyebrow: "Planejamento" },
+        assistente: { title: "Assistente financeiro", eyebrow: "IA local" },
+        perfil: { title: "Perfil", eyebrow: "Configuracoes" },
+        futuro: { title: "Pix, cripto e acoes", eyebrow: "Recursos futuros" },
+        seguranca: { title: "Seguranca e privacidade", eyebrow: "Privacidade" }
+    };
+
+    const BOT_PROMPTS = {
+        resumo: "Resumir meu mes",
+        otimizar: "Como reduzir gastos?",
+        meta: "Como esta minha meta?",
+        categoria: "Onde gasto mais?"
+    };
 
     function csrf() {
         return {
@@ -9,40 +26,59 @@
     }
 
     function hydrate(root) {
-        root.querySelectorAll("[data-open-panel]").forEach((button) => {
-            if (button.dataset.boundOpenPanel) {
-                return;
-            }
-
-            button.dataset.boundOpenPanel = "true";
+        bindOnce(root, "[data-open-panel]", "boundOpenPanel", (button) => {
             button.addEventListener("click", () => openPanel(button.dataset.openPanel));
         });
 
-        root.querySelectorAll("[data-menu-toggle]").forEach((button) => {
-            if (button.dataset.boundMenuToggle) {
-                return;
-            }
+        bindOnce(root, "[data-form-toggle]", "boundFormToggle", (button) => {
+            button.addEventListener("click", () => {
+                const form = button.closest(".transacao-form");
+                if (!form) {
+                    return;
+                }
+                const expanded = !form.classList.contains("is-expanded");
+                form.classList.toggle("is-expanded", expanded);
+                form.classList.toggle("is-collapsed", !expanded);
+                button.setAttribute("aria-expanded", expanded ? "true" : "false");
+            });
+        });
 
-            button.dataset.boundMenuToggle = "true";
+        bindOnce(root, "[data-menu-toggle]", "boundMenuToggle", (button) => {
             button.addEventListener("click", () => document.body.classList.toggle("menu-open"));
         });
 
-        root.querySelectorAll("[data-theme-toggle]").forEach((button) => {
-            if (button.dataset.boundThemeToggle) {
-                return;
-            }
-
-            button.dataset.boundThemeToggle = "true";
+        bindOnce(root, "[data-theme-toggle]", "boundThemeToggle", (button) => {
             button.addEventListener("click", toggleTheme);
         });
 
-        root.querySelectorAll("[data-bot-action]").forEach((button) => {
-            if (button.dataset.boundBotAction) {
+        bindOnce(root, "[data-bot-action]", "boundBotAction", (button) => {
+            button.addEventListener("click", () => {
+                const prompt = BOT_PROMPTS[button.dataset.botAction] || button.textContent.trim();
+                sendBotMessage(prompt, button.dataset.botAction);
+            });
+        });
+
+        bindOnce(root, "[data-bot-send]", "boundBotSend", (button) => {
+            button.addEventListener("click", handleBotSend);
+        });
+
+        bindOnce(root, "[data-bot-input]", "boundBotInput", (input) => {
+            input.addEventListener("keydown", (event) => {
+                if (event.key === "Enter" && !event.shiftKey) {
+                    event.preventDefault();
+                    handleBotSend();
+                }
+            });
+        });
+    }
+
+    function bindOnce(root, selector, flag, handler) {
+        root.querySelectorAll(selector).forEach((element) => {
+            if (element.dataset[flag]) {
                 return;
             }
-
-            button.dataset.boundBotAction = "true";
-            button.addEventListener("click", () => askBot(button.dataset.botAction));
+            element.dataset[flag] = "true";
+            handler(element);
         });
     }
 
@@ -56,30 +92,44 @@
         });
 
         document.body.classList.remove("menu-open");
-        
-        // Atualizar título dinamicamente
-        updatePageTitle(panelName);
+        updatePageHeader(panelName);
     }
-    
-    function updatePageTitle(panelName) {
-        const titles = {
-            "dashboard": "Dashboard",
-            "planejamento": "Metas e Gráficos",
-            "assistente": "IA Local",
-            "perfil": "Perfil e Tema",
-            "futuro": "Pix, Cripto e Acoes",
-            "seguranca": "Seguranca e Privacidade"
-        };
-        
-        const mainTitle = document.querySelector("#page-title-main");
-        if (mainTitle && titles[panelName]) {
-            mainTitle.textContent = titles[panelName];
+
+    function updatePageHeader(panelName) {
+        const config = PANELS[panelName];
+        if (!config) {
+            return;
+        }
+
+        const eyebrow = document.querySelector("#page-eyebrow");
+        const title = document.querySelector("#page-title");
+        const period = document.querySelector("#page-period");
+
+        if (eyebrow) {
+            eyebrow.textContent = config.eyebrow;
+        }
+        if (title) {
+            title.textContent = config.title;
+        }
+        if (period) {
+            period.classList.toggle("is-hidden", panelName !== "dashboard");
         }
     }
 
     function applyTheme(theme) {
-        document.documentElement.dataset.theme = theme;
+        const isDark = theme === "dark";
+        document.documentElement.dataset.theme = isDark ? "dark" : "light";
         localStorage.setItem(storageKey, theme);
+
+        document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+            button.setAttribute("aria-checked", isDark ? "true" : "false");
+            button.setAttribute(
+                "aria-label",
+                isDark
+                    ? "Tema escuro ativo. Clique para ativar o tema claro"
+                    : "Tema claro ativo. Clique para ativar o tema escuro"
+            );
+        });
     }
 
     function toggleTheme() {
@@ -156,87 +206,127 @@
         replaceTarget(target, await response.text(), swap);
     }
 
-    function askBot(topic) {
+    function botContext() {
         const bot = document.querySelector("#finance-bot");
-        const feed = document.querySelector("#bot-feed");
+        return {
+            saldo: bot?.dataset.saldo || "0,00",
+            receitas: bot?.dataset.receitas || "0,00",
+            despesas: bot?.dataset.despesas || "0,00",
+            categoria: bot?.dataset.categoria || "nenhuma categoria",
+            economia: bot?.dataset.economia || "0,00",
+            insight: bot?.dataset.insight || ""
+        };
+    }
 
-        if (!bot || !feed) {
+    function buildBotAnswer(text, topic) {
+        const ctx = botContext();
+        const normalized = text.toLowerCase();
+
+        if (topic === "resumo" || normalized.includes("resum")) {
+            return "Seu saldo atual e R$ " + ctx.saldo + ". Neste mes voce recebeu R$ "
+                + ctx.receitas + " e gastou R$ " + ctx.despesas + ".";
+        }
+
+        if (topic === "otimizar" || normalized.includes("reduz") || normalized.includes("econom")) {
+            return "Comece revisando " + ctx.categoria + ". Separar R$ " + ctx.economia
+                + " para a reserva ja melhora seu ritmo mensal.";
+        }
+
+        if (topic === "meta" || normalized.includes("meta") || normalized.includes("reserva")) {
+            return "Sua meta de reserva ainda precisa de R$ " + ctx.economia + ". "
+                + (ctx.insight || "Revise despesas variaveis para acelerar o progresso.");
+        }
+
+        if (topic === "categoria" || normalized.includes("categoria") || normalized.includes("gasto")) {
+            return "A categoria com maior peso no mes e " + ctx.categoria + ". "
+                + "Priorize cortes pequenos nela antes de mexer em gastos fixos.";
+        }
+
+        if (normalized.includes("saldo")) {
+            return "Seu saldo atual e R$ " + ctx.saldo + ".";
+        }
+
+        if (normalized.includes("receita") || normalized.includes("entrada")) {
+            return "Suas receitas do mes somam R$ " + ctx.receitas + ".";
+        }
+
+        if (normalized.includes("despesa") || normalized.includes("gastei")) {
+            return "Suas despesas do mes somam R$ " + ctx.despesas + ".";
+        }
+
+        return ctx.insight || ("Com base nos seus dados: saldo R$ " + ctx.saldo
+            + ", receitas R$ " + ctx.receitas + " e despesas R$ " + ctx.despesas + ".");
+    }
+
+    function appendBotMessage(text, className) {
+        const feed = document.querySelector("#bot-feed");
+        if (!feed) {
             return;
         }
 
-        const saldo = bot.dataset.saldo || "0,00";
-        const receitas = bot.dataset.receitas || "0,00";
-        const despesas = bot.dataset.despesas || "0,00";
-        const categoria = bot.dataset.categoria || "nenhuma categoria";
-        const economia = bot.dataset.economia || "0,00";
-        const answers = {
-            resumo: "Seu saldo atual e R$ " + saldo + ". Neste mes voce recebeu R$ " + receitas + " e gastou R$ " + despesas + ".",
-            otimizar: "Comece revisando " + categoria + ". Separar R$ " + economia + " para a reserva ja cria um bom ritmo.",
-            futuro: "Recursos como Pix, cripto e acoes devem entrar com consentimento claro, limites por transacao e conexoes protegidas."
-        };
+        document.querySelector(".bot-welcome")?.classList.add("is-hidden");
 
         const message = document.createElement("div");
-        message.className = "bot-message";
-        message.textContent = answers[topic] || answers.resumo;
+        message.className = className;
+        message.textContent = text;
         feed.appendChild(message);
         feed.scrollTop = feed.scrollHeight;
     }
-    
-    function handleBotSend() {
-        const input = document.querySelector("#bot-input");
-        const feed = document.querySelector("#bot-feed");
-        
-        if (!input || !feed || !input.value.trim()) {
+
+    function sendBotMessage(text, topic) {
+        const question = text.trim().slice(0, maxBotMessageLength);
+        if (!question) {
             return;
         }
-        
-        // Remover mensagem inicial se existir
-        const initialMsg = feed.querySelector(".bot-initial");
-        if (initialMsg) {
-            initialMsg.remove();
+
+        appendBotMessage(question, "bot-message user-message");
+        window.setTimeout(() => {
+            appendBotMessage(buildBotAnswer(question, topic), "bot-message bot-message--assistant");
+        }, 280);
+    }
+
+    function handleBotSend() {
+        const input = document.querySelector("#bot-input");
+        if (!input) {
+            return;
         }
-        
-        // Adicionar mensagem do usuario
-        const userMsg = document.createElement("div");
-        userMsg.className = "bot-message user-message";
-        userMsg.textContent = input.value;
-        feed.appendChild(userMsg);
-        
-        // Simular resposta da IA
-        const bot = document.querySelector("#finance-bot");
-        const saldo = bot?.dataset.saldo || "0,00";
-        const receitas = bot?.dataset.receitas || "0,00";
-        const despesas = bot?.dataset.despesas || "0,00";
-        
-        const botMsg = document.createElement("div");
-        botMsg.className = "bot-message";
-        botMsg.textContent = "Voce perguntou sobre: '" + input.value + "'. Seu saldo atual e R$ " + saldo + ".";
-        feed.appendChild(botMsg);
-        
+
+        const text = input.value.trim();
+        if (!text) {
+            return;
+        }
+
+        sendBotMessage(text);
         input.value = "";
-        feed.scrollTop = feed.scrollHeight;
+        input.focus();
     }
 
     document.addEventListener("submit", (event) => {
         const form = event.target.closest("form[hx-post]");
-
         if (!form) {
             return;
         }
-
         event.preventDefault();
         submitAjax(form);
     });
 
     document.addEventListener("click", (event) => {
         const trigger = event.target.closest("[hx-get]");
-
         if (!trigger) {
             return;
         }
-
         event.preventDefault();
         clickAjax(trigger);
     });
 
-    function bindBotSendButton() {\n        const sendBtn = document.querySelector("#bot-send");\n        const input = document.querySelector("#bot-input");\n        \n        if (!sendBtn || !input) {\n            return;\n        }\n        \n        sendBtn.addEventListener("click", handleBotSend);\n        input.addEventListener("keypress", (e) => {\n            if (e.key === "Enter") {\n                handleBotSend();\n            }\n        });\n    }\n\n    document.addEventListener("DOMContentLoaded", () => {\n        applyTheme(localStorage.getItem(storageKey) || "light");\n        hydrate(document);\n        bindBotSendButton();\n    });\n})();
+    document.addEventListener("DOMContentLoaded", () => {
+        const isAuthPage = document.body.classList.contains("auth-page");
+        const savedTheme = localStorage.getItem(storageKey);
+        applyTheme(savedTheme || (isAuthPage ? "dark" : "light"));
+        hydrate(document);
+
+        if (!isAuthPage) {
+            openPanel("dashboard");
+        }
+    });
+})();

@@ -3,90 +3,11 @@
 <head th:replace="~{fragments/assets :: head('Dashboard - Gestor Financeiro')}"></head>
 <body>
     <div class="app-shell">
-        <aside class="sidebar" aria-label="Menu principal">
-            <button type="button" class="brand-button" data-menu-toggle aria-label="Abrir menu">
-                <span class="brand-mark"></span>
-            </button>
-
-            <nav class="nav-stack" aria-label="Paginas">
-                <button type="button" class="nav-button is-active" data-open-panel="dashboard" title="Dashboard" aria-label="Dashboard">
-                    <span class="nav-glyph">DB</span>
-                </button>
-                <button type="button" class="nav-button" data-open-panel="planejamento" title="Planejamento" aria-label="Planejamento">
-                    <span class="nav-glyph">PL</span>
-                </button>
-                <button type="button" class="nav-button" data-open-panel="assistente" title="Assistente" aria-label="Assistente">
-                    <span class="nav-glyph">IA</span>
-                </button>
-                <button type="button" class="nav-button" data-open-panel="perfil" title="Perfil" aria-label="Perfil">
-                    <span class="nav-glyph">PF</span>
-                </button>
-                <button type="button" class="nav-button" data-open-panel="futuro" title="Futuro" aria-label="Futuro">
-                    <span class="nav-glyph">FX</span>
-                </button>
-                <button type="button" class="nav-button" data-open-panel="seguranca" title="Seguranca" aria-label="Seguranca">
-                    <span class="nav-glyph">SC</span>
-                </button>
-            </nav>
-
-            <div class="side-menu">
-                <div class="side-menu-header">
-                    <p class="side-menu-title">Gestor Financeiro</p>
-                    <p class="side-menu-subtitle" th:text="${emailUsuario}">usuario@email.com</p>
-                </div>
-
-                <div class="side-menu-list">
-                    <button type="button" class="menu-link is-active" data-open-panel="dashboard">
-                        <span class="nav-glyph">DB</span>
-                        Dashboard
-                    </button>
-                    <button type="button" class="menu-link" data-open-panel="dashboard">
-                        <span class="nav-glyph">NT</span>
-                        Nova transacao
-                    </button>
-                    <button type="button" class="menu-link" data-open-panel="planejamento">
-                        <span class="nav-glyph">PL</span>
-                        Metas e graficos
-                    </button>
-                    <button type="button" class="menu-link" data-open-panel="assistente">
-                        <span class="nav-glyph">IA</span>
-                        Assistente financeiro
-                    </button>
-                    <button type="button" class="menu-link" data-open-panel="perfil">
-                        <span class="nav-glyph">PF</span>
-                        Perfil e tema
-                    </button>
-                    <button type="button" class="menu-link" data-open-panel="futuro">
-                        <span class="nav-glyph">FX</span>
-                        Pix, cripto e acoes
-                    </button>
-                    <button type="button" class="menu-link" data-open-panel="seguranca">
-                        <span class="nav-glyph">SC</span>
-                        Seguranca e privacidade
-                    </button>
-                    <button type="button" class="menu-link" data-theme-toggle>
-                        <span class="nav-glyph">TH</span>
-                        Alternar tema
-                    </button>
-                </div>
-
-                <form th:action="@{/logout}" method="post" class="logout-form">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                    <button type="submit" class="danger-button">Sair com seguranca</button>
-                </form>
-            </div>
-        </aside>
+        <aside th:replace="~{fragments/dashboard/sidebar :: sidebar}"></aside>
 
         <main class="page">
             <div id="dashboard-content" th:fragment="dashboardContent">
-                <section class="hero-strip">
-                    <div>
-                        <p class="eyebrow">Resumo do mes</p>
-                        <h1 class="page-title" id="page-title-main">Dashboard</h1>
-                        <p class="section-subtitle" th:text="'Ola, ' + ${usuarioNome}">Ola, usuario</p>
-                        <p class="hero-copy">Um painel profissional para visualizar saldo, receitas, despesas, metas e riscos sem expor seus dados para servicos externos.</p>
-                    </div>
-                </section>
+                <header th:replace="~{fragments/dashboard/page-header :: header}"></header>
 
                 <section id="panel-dashboard" class="dashboard-panel is-active">
                     <section class="summary-grid">
@@ -95,7 +16,7 @@
                                 <p class="stat-label">Saldo atual</p>
                                 <span class="badge">Atual</span>
                             </div>
-                            <p class="stat-value" th:classappend="${saldoNegativo} ? ' danger' : ' positive'">
+                            <p class="stat-value" th:classappend="${saldoNegativo} ? ' muted-strong' : ''">
                                 R$ <span th:text="${#numbers.formatDecimal(resumo.saldoAtual, 1, 'POINT', 2, 'COMMA')}">0,00</span>
                             </p>
                         </article>
@@ -105,7 +26,7 @@
                                 <p class="stat-label">Receitas</p>
                                 <span class="badge">Entrada</span>
                             </div>
-                            <p class="stat-value positive">
+                            <p class="stat-value">
                                 R$ <span th:text="${#numbers.formatDecimal(resumo.receitasMes, 1, 'POINT', 2, 'COMMA')}">0,00</span>
                             </p>
                         </article>
@@ -115,7 +36,7 @@
                                 <p class="stat-label">Despesas</p>
                                 <span class="badge">Saida</span>
                             </div>
-                            <p class="stat-value warning">
+                            <p class="stat-value muted">
                                 R$ <span th:text="${#numbers.formatDecimal(resumo.despesasMes, 1, 'POINT', 2, 'COMMA')}">0,00</span>
                             </p>
                         </article>
@@ -131,26 +52,35 @@
                                   hx-target="#dashboard-content"
                                   hx-swap="outerHTML"
                                   method="post"
-                                  class="form-card">
+                                  class="form-card transacao-form"
+                                  th:classappend="${modoEdicao} ? ' is-expanded' : ' is-collapsed'">
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
-                                <div class="panel-head compact-head">
-                                    <div>
-                                        <p class="section-title" th:text="${modoEdicao} ? 'Editar transacao' : 'Nova transacao'">Nova transacao</p>
-                                        <p class="section-subtitle">Valores positivos; o tipo define o saldo.</p>
-                                    </div>
+                                <div class="form-card-toolbar">
+                                    <button type="button"
+                                            class="form-card-toggle"
+                                            data-form-toggle
+                                            th:attr="aria-expanded=${modoEdicao} ? 'true' : 'false'">
+                                        <span class="form-card-toggle-text">
+                                            <span class="section-title" th:text="${modoEdicao} ? 'Editar transacao' : 'Nova transacao'">Nova transacao</span>
+                                            <span class="section-subtitle" th:if="${!modoEdicao}">Clique para abrir o formulario</span>
+                                            <span class="section-subtitle" th:if="${modoEdicao}">Valores positivos; o tipo define o saldo</span>
+                                        </span>
+                                        <span th:replace="~{fragments/icons :: chevron}"></span>
+                                    </button>
                                     <a th:if="${modoEdicao}"
                                        th:href="@{/transacoes/novo}"
                                        th:attr="hx-get=@{/transacoes/novo}"
                                        hx-target="#form-transacao"
                                        hx-swap="outerHTML"
-                                       class="icon-button"
+                                       class="icon-button icon-button--ghost"
                                        title="Cancelar edicao"
                                        aria-label="Cancelar edicao">
-                                        <span class="nav-glyph">X</span>
+                                        <span th:replace="~{fragments/icons :: close}"></span>
                                     </a>
                                 </div>
 
+                                <div class="form-card-body">
                                 <div class="field-stack">
                                     <label class="field">
                                         <span>Descricao</span>
@@ -191,13 +121,14 @@
 
                                     <button type="submit" class="primary-button" th:text="${modoEdicao} ? 'Salvar alteracoes' : 'Adicionar'">Adicionar</button>
                                 </div>
+                                </div>
                             </form>
 
                             <article class="chart-card card">
                                 <div class="panel-head compact-head">
                                     <div>
                                         <p class="section-title">Fluxo dos ultimos 6 meses</p>
-                                        <p class="section-subtitle">Verde: receitas. Dourado: despesas.</p>
+                                        <p class="section-subtitle">Barras claras: receitas. Barras escuras: despesas.</p>
                                     </div>
                                 </div>
                                 <div class="chart-area">
@@ -238,9 +169,7 @@
                                             <td colspan="6" class="empty-row">Nenhuma transacao cadastrada neste mes.</td>
                                         </tr>
                                         <tr th:each="transacao : ${transacoes}">
-                                            <td>
-                                                <strong th:text="${transacao.descricao}">Mercado</strong>
-                                            </td>
+                                            <td><strong th:text="${transacao.descricao}">Mercado</strong></td>
                                             <td th:text="${transacao.categoria.descricao}">Alimentacao</td>
                                             <td th:text="${#temporals.format(transacao.data, 'dd/MM/yyyy')}">27/05/2026</td>
                                             <td>
@@ -248,7 +177,7 @@
                                                       th:classappend="${transacao.tipo.name() == 'RECEITA'} ? ' pill-income' : ' pill-expense'"
                                                       th:text="${transacao.tipo.descricao}">Despesa</span>
                                             </td>
-                                            <td class="amount-cell" th:classappend="${transacao.tipo.name() == 'RECEITA'} ? ' positive' : ' danger'">
+                                            <td class="amount-cell">
                                                 <span th:text="${transacao.tipo.name() == 'RECEITA'} ? '+' : '-'">-</span>
                                                 R$ <span th:text="${#numbers.formatDecimal(transacao.valor, 1, 'POINT', 2, 'COMMA')}">0,00</span>
                                             </td>
@@ -258,20 +187,22 @@
                                                             th:attr="hx-get=@{/transacoes/{id}/editar(id=${transacao.id})}"
                                                             hx-target="#form-transacao"
                                                             hx-swap="outerHTML"
-                                                            class="icon-button"
-                                                            title="Editar"
-                                                            aria-label="Editar">
-                                                        <span class="nav-glyph">ED</span>
+                                                            class="icon-button icon-button--edit"
+                                                            title="Editar transacao"
+                                                            aria-label="Editar transacao">
+                                                        <span th:replace="~{fragments/icons :: edit}"></span>
                                                     </button>
 
                                                     <form th:action="@{/transacoes/{id}/excluir(id=${transacao.id})}"
                                                           th:attr="hx-post=@{/transacoes/{id}/excluir(id=${transacao.id})}"
                                                           hx-target="#dashboard-content"
                                                           hx-swap="outerHTML"
-                                                          method="post">
+                                                          method="post"
+                                                          class="inline-form"
+                                                          onsubmit="return confirm('Excluir esta transacao?');">
                                                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                                                        <button type="submit" class="icon-button" title="Excluir" aria-label="Excluir">
-                                                            <span class="nav-glyph">DL</span>
+                                                        <button type="submit" class="icon-button icon-button--delete" title="Excluir transacao" aria-label="Excluir transacao">
+                                                            <span th:replace="~{fragments/icons :: delete}"></span>
                                                         </button>
                                                     </form>
                                                 </div>
@@ -285,14 +216,6 @@
                 </section>
 
                 <section id="panel-planejamento" class="dashboard-panel">
-                    <section class="hero-strip">
-                        <div>
-                            <p class="eyebrow">Planejamento financeiro</p>
-                            <h1 class="page-title" id="page-title-planejamento">Metas e Gráficos</h1>
-                            <p class="section-subtitle" th:text="'Ola, ' + ${usuarioNome}">Ola, usuario</p>
-                            <p class="hero-copy">Acompanhe suas metas financeiras e visualize como seus gastos estão distribuidos por categoria.</p>
-                        </div>
-                    </section>
                     <div class="insight-grid">
                         <article class="insight-card card">
                             <p class="section-title" th:text="${meta.nome}">Reserva de seguranca</p>
@@ -322,109 +245,85 @@
                         <article class="insight-card card">
                             <p class="section-title" th:text="${insight.titulo}">Insight</p>
                             <p class="section-subtitle" th:text="${insight.mensagem}">Mensagem</p>
-                            <span class="badge" th:text="${insight.nivel}">positivo</span>
+                            <span class="badge" th:text="${insight.nivel}">neutro</span>
                         </article>
                     </div>
                 </section>
 
                 <section id="panel-assistente" class="dashboard-panel">
-                    <section class="hero-strip">
-                        <div>
-                            <p class="eyebrow">Assistente financeiro</p>
-                            <h1 class="page-title" id="page-title-assistente">IA Local</h1>
-                            <p class="section-subtitle" th:text="'Ola, ' + ${usuarioNome}">Ola, usuario</p>
-                            <p class="hero-copy">Um assistente local que resume seus dados sem enviar historico para fora do app. Faça perguntas sobre suas finanças.</p>
-                        </div>
-                    </section>
-                    <div class="bot-main">
+                    <div class="gemini-shell">
                         <article id="finance-bot"
-                                 class="bot-container"
+                                 class="gemini-chat"
                                  th:data-saldo="${#numbers.formatDecimal(resumo.saldoAtual, 1, 'POINT', 2, 'COMMA')}"
                                  th:data-receitas="${#numbers.formatDecimal(resumo.receitasMes, 1, 'POINT', 2, 'COMMA')}"
                                  th:data-despesas="${#numbers.formatDecimal(resumo.despesasMes, 1, 'POINT', 2, 'COMMA')}"
                                  th:data-categoria="${principalCategoria}"
-                                 th:data-economia="${#numbers.formatDecimal(meta.restante, 1, 'POINT', 2, 'COMMA')}">
-                            <div id="bot-feed" class="bot-feed">
-                                <div class="bot-message bot-initial">Escolha uma pergunta ou digite sua duvida abaixo.</div>
+                                 th:data-economia="${#numbers.formatDecimal(meta.restante, 1, 'POINT', 2, 'COMMA')}"
+                                 th:data-insight="${insight.mensagem}">
+                            <div id="bot-feed" class="gemini-feed">
+                                <div class="bot-welcome">
+                                    <p class="bot-welcome-title">Assistente financeiro</p>
+                                    <p class="bot-welcome-text">Analise seu mes com base nos seus dados locais. Nada e enviado para fora do app.</p>
+                                    <div class="gemini-chips">
+                                        <button type="button" class="chip-button" data-bot-action="resumo">Resumir meu mes</button>
+                                        <button type="button" class="chip-button" data-bot-action="otimizar">Como reduzir gastos?</button>
+                                        <button type="button" class="chip-button" data-bot-action="meta">Como esta minha meta?</button>
+                                        <button type="button" class="chip-button" data-bot-action="categoria">Onde gasto mais?</button>
+                                    </div>
+                                </div>
                             </div>
-                            
-                            <div class="bot-input-area">
-                                <input type="text" id="bot-input" class="bot-text-input" placeholder="Faça uma pergunta sobre suas finanças..." autocomplete="off">
-                                <button type="button" id="bot-send" class="bot-send-button" aria-label="Enviar pergunta" title="Enviar">Enviar</button>
+
+                            <div class="gemini-input-bar">
+                                <input type="text"
+                                       id="bot-input"
+                                       data-bot-input
+                                       class="gemini-input"
+                                       placeholder="Pergunte sobre saldo, gastos ou metas..."
+                                       autocomplete="off"
+                                       maxlength="220">
+                                <button type="button" id="bot-send" data-bot-send class="gemini-send" aria-label="Enviar pergunta">
+                                    <span th:replace="~{fragments/icons :: send}"></span>
+                                </button>
                             </div>
                         </article>
-
-                        <aside class="bot-suggestions">
-                            <p class="section-subtitle">Perguntas pre-definidas:</p>
-                            <button type="button" class="secondary-button" data-bot-action="resumo">Resumir meu mes</button>
-                            <button type="button" class="secondary-button" data-bot-action="otimizar">Como reduzir gastos?</button>
-                            <button type="button" class="secondary-button" data-bot-action="futuro">Pix e investimentos</button>
-                        </aside>
                     </div>
                 </section>
 
                 <section id="panel-perfil" class="dashboard-panel">
-                    <section class="hero-strip">
-                        <div>
-                            <p class="eyebrow">Configuracoes</p>
-                            <h1 class="page-title" id="page-title-perfil">Perfil e Tema</h1>
-                            <p class="section-subtitle" th:text="'Ola, ' + ${usuarioNome}">Ola, usuario</p>
-                            <p class="hero-copy">Gerencie seu perfil e preferencias de tema visual.</p>
+                    <form th:action="@{/perfil}"
+                          th:object="${perfilForm}"
+                          hx-post="/perfil"
+                          hx-target="#dashboard-content"
+                          hx-swap="outerHTML"
+                          method="post"
+                          class="form-card perfil-card">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <div class="panel-head compact-head">
+                            <div>
+                                <p class="section-title">Seu perfil</p>
+                                <p class="section-subtitle">Altere apenas dados seguros neste MVP.</p>
+                            </div>
                         </div>
-                    </section>
-                    <div class="bot-layout">
-                        <form th:action="@{/perfil}"
-                              th:object="${perfilForm}"
-                              hx-post="/perfil"
-                              hx-target="#dashboard-content"
-                              hx-swap="outerHTML"
-                              method="post"
-                              class="form-card">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                            <div class="panel-head compact-head">
-                                <div>
-                                    <p class="section-title">Perfil</p>
-                                    <p class="section-subtitle">Altere apenas dados seguros neste MVP.</p>
-                                </div>
-                            </div>
 
-                            <div class="field-stack">
-                                <label class="field">
-                                    <span>Nome</span>
-                                    <input th:field="*{nome}" type="text" maxlength="120" required>
-                                    <span th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}" class="field-error"></span>
-                                </label>
+                        <div class="field-stack">
+                            <label class="field">
+                                <span>Nome</span>
+                                <input th:field="*{nome}" type="text" maxlength="120" required>
+                                <span th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}" class="field-error"></span>
+                            </label>
 
-                                <label class="field">
-                                    <span>E-mail de login</span>
-                                    <input th:value="${emailUsuario}" type="email" disabled>
-                                    <span class="field-hint">Troca de e-mail deve exigir confirmacao forte antes de ser liberada.</span>
-                                </label>
+                            <label class="field">
+                                <span>E-mail de login</span>
+                                <input th:value="${emailUsuario}" type="email" disabled>
+                                <span class="field-hint">Troca de e-mail exige confirmacao forte antes de ser liberada.</span>
+                            </label>
 
-                                <button type="submit" class="primary-button">Salvar perfil</button>
-                            </div>
-                        </form>
-
-                        <aside class="bot-card">
-                            <p class="section-title">Preferencias</p>
-                            <p class="section-subtitle">Tema visual salvo apenas neste navegador.</p>
-                            <div class="field-stack">
-                                <button type="button" class="secondary-button" data-theme-toggle>Alternar tema claro/escuro</button>
-                                <p class="section-subtitle">Preferencias locais nao alteram seus dados financeiros no servidor.</p>
-                            </div>
-                        </aside>
-                    </div>
+                            <button type="submit" class="primary-button">Salvar perfil</button>
+                        </div>
+                    </form>
                 </section>
 
                 <section id="panel-futuro" class="dashboard-panel">
-                    <section class="hero-strip">
-                        <div>
-                            <p class="eyebrow">Recursos futuros</p>
-                            <h1 class="page-title" id="page-title-futuro">Pix, Cripto e Acoes</h1>
-                            <p class="section-subtitle" th:text="'Ola, ' + ${usuarioNome}">Ola, usuario</p>
-                            <p class="hero-copy">Novos recursos chegando em breve com seguranca e controle total.</p>
-                        </div>
-                    </section>
                     <div class="future-grid">
                         <article class="future-card">
                             <span class="badge">Em breve</span>
@@ -435,38 +334,30 @@
                         <article class="future-card">
                             <span class="badge">Em breve</span>
                             <h2 class="section-title">Cripto moedas</h2>
-                            <p class="section-subtitle">Pagina apenas de consulta, sem chave privada e sem guardar credenciais de corretora.</p>
+                            <p class="section-subtitle">Pagina apenas de consulta, sem chave privada e sem credenciais de corretora.</p>
                         </article>
 
                         <article class="future-card">
                             <span class="badge">Em breve</span>
                             <h2 class="section-title">Acoes e noticias</h2>
-                            <p class="section-subtitle">Integracao futura com dados publicos e alertas, separada da area de transacoes pessoais.</p>
+                            <p class="section-subtitle">Integracao futura com dados publicos e alertas.</p>
                         </article>
                     </div>
                 </section>
 
                 <section id="panel-seguranca" class="dashboard-panel">
-                    <section class="hero-strip">
-                        <div>
-                            <p class="eyebrow">Privacidade</p>
-                            <h1 class="page-title" id="page-title-seguranca">Seguranca e Privacidade</h1>
-                            <p class="section-subtitle" th:text="'Ola, ' + ${usuarioNome}">Ola, usuario</p>
-                            <p class="hero-copy">Saiba como seus dados sao protegidos nesta aplicacao.</p>
-                        </div>
-                    </section>
                     <ul class="secure-list">
                         <li>
                             <strong>Sem CDN na interface</strong>
-                            <p class="section-subtitle">CSS e JavaScript ficam no proprio projeto, reduzindo risco de script externo roubar dados.</p>
+                            <p class="section-subtitle">CSS e JavaScript ficam no proprio projeto.</p>
                         </li>
                         <li>
                             <strong>Protecoes HTTP ativas</strong>
-                            <p class="section-subtitle">CSP, anti-clickjacking, politica de referencia, CSRF e cookies HTTPOnly/SameSite.</p>
+                            <p class="section-subtitle">CSP, anti-clickjacking, CSRF e cookies protegidos.</p>
                         </li>
                         <li>
                             <strong>Isolamento por usuario</strong>
-                            <p class="section-subtitle">Toda consulta de transacao passa pelo usuario autenticado antes de listar, editar ou excluir.</p>
+                            <p class="section-subtitle">Transacoes sempre filtradas pelo usuario autenticado.</p>
                         </li>
                     </ul>
                 </section>

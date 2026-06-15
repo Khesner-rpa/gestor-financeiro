@@ -82,6 +82,10 @@
                 button.textContent = hidden ? "Alterar meta" : "Fechar";
             });
         });
+
+        bindOnce(root, "[data-pie-percent]", "boundPiePercent", (element) => {
+            element.style.setProperty("--meta-percent", element.dataset.piePercent);
+        });
     }
 
     function bindOnce(root, selector, flag, handler) {

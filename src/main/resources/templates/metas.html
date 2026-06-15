@@ -14,10 +14,10 @@
 
             <div class="investment-pie-wrap">
                 <div class="investment-pie"
-                     th:style="'--meta-percent: ' + ${meta.percentual} + ';'"
+                     th:data-pie-percent="${#numbers.formatDecimal(meta.percentual, 1, 1, 'POINT')}"
                      role="img"
-                     th:attr="aria-label=${'Grafico de investimentos com ' + meta.percentual + '% concluido'}">
-                    <span th:text="${meta.percentual} + '%'">0%</span>
+                     th:attr="aria-label=${'Grafico de investimentos com ' + #numbers.formatDecimal(meta.percentual, 1, 1, 'COMMA') + '% concluido'}">
+                    <span th:text="${#numbers.formatDecimal(meta.percentual, 1, 1, 'COMMA')} + '%'">0%</span>
                 </div>
                 <div class="investment-legend">
                     <div class="investment-legend-row">
@@ -33,9 +33,9 @@
                 </div>
             </div>
 
-            <progress class="progress-native" th:value="${meta.percentual}" max="100"></progress>
+            <progress class="progress-native" th:value="${#numbers.formatDecimal(meta.percentual, 1, 1, 'POINT')}" max="100"></progress>
             <p class="section-subtitle">
-                <strong th:text="${meta.percentual} + '%'">0%</strong>
+                <strong th:text="${#numbers.formatDecimal(meta.percentual, 1, 1, 'COMMA')} + '%'">0%</strong>
                 concluido. Falta R$
                 <span th:text="${#numbers.formatDecimal(meta.restante, 1, 'POINT', 2, 'COMMA')}">0,00</span>.
             </p>

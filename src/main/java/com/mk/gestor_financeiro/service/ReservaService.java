@@ -26,6 +26,19 @@ public class ReservaService {
     }
 
     @Transactional
+    public void atualizarObjetivo(Usuario usuario, BigDecimal objetivo) {
+        if (objetivo == null || objetivo.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Informe uma meta maior que zero.");
+        }
+
+        Reserva reserva = reservaRepository.findByUsuarioId(usuario.getId())
+                .orElseGet(() -> criarReservaInicial(usuario));
+
+        reserva.setObjetivo(objetivo);
+        reservaRepository.save(reserva);
+    }
+
+    @Transactional
     public void depositar(Usuario usuario, BigDecimal valor, BigDecimal saldoAtual) {
         if (valor == null || valor.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Informe um valor maior que zero.");

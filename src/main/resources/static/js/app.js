@@ -86,6 +86,18 @@
                 }
             });
         });
+
+        bindOnce(root, "[data-goal-toggle]", "boundGoalToggle", (button) => {
+            button.addEventListener("click", () => {
+                const form = button.closest(".insight-card")?.querySelector("[data-goal-form]");
+                if (!form) {
+                    return;
+                }
+
+                const hidden = form.classList.toggle("is-hidden");
+                button.textContent = hidden ? "Alterar meta" : "Fechar";
+            });
+        });
     }
 
     function bindOnce(root, selector, flag, handler) {

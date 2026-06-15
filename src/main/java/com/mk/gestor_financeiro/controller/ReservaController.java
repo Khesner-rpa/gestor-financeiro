@@ -49,6 +49,17 @@ public class ReservaController {
         return renderDashboard(model, principal.getName(), request);
     }
 
+    @PostMapping("/objetivo")
+    public String atualizarObjetivo(@RequestParam BigDecimal objetivo, Principal principal, Model model, HttpServletRequest request) {
+        Usuario usuario = usuarioService.buscarPorEmail(principal.getName());
+        try {
+            reservaService.atualizarObjetivo(usuario, objetivo);
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("erroReserva", e.getMessage());
+        }
+        return renderDashboard(model, principal.getName(), request);
+    }
+
     private String renderDashboard(Model model, String emailUsuario, HttpServletRequest request) {
         dashboardModelFactory.popular(model, emailUsuario, TransacaoForm.novo(), null);
         return "true".equalsIgnoreCase(request.getHeader("HX-Request")) ? "dashboard :: dashboardContent" : "dashboard";

@@ -1,0 +1,33 @@
+<section id="panel-perfil" class="dashboard-panel" th:fragment="perfil">
+    <form th:action="@{/perfil}"
+          th:object="${perfilForm}"
+          hx-post="/perfil"
+          hx-target="#dashboard-content"
+          hx-swap="outerHTML"
+          method="post"
+          class="form-card perfil-card">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <div class="panel-head compact-head">
+            <div>
+                <p class="section-title">Seu perfil</p>
+                <p class="section-subtitle">Altere apenas dados seguros neste MVP.</p>
+            </div>
+        </div>
+
+        <div class="field-stack">
+            <label class="field">
+                <span>Nome</span>
+                <input th:field="*{nome}" type="text" maxlength="120" required>
+                <span th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}" class="field-error"></span>
+            </label>
+
+            <label class="field">
+                <span>E-mail de login</span>
+                <input th:value="${emailUsuario}" type="email" disabled>
+                <span class="field-hint">Troca de e-mail exige confirmacao forte antes de ser liberada.</span>
+            </label>
+
+            <button type="submit" class="primary-button">Salvar perfil</button>
+        </div>
+    </form>
+</section>

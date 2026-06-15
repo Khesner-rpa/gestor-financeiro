@@ -1,0 +1,25 @@
+<<<<<<< HEAD
+<header class="page-header" th:fragment="header">
+    <div class="page-header-main">
+        <p class="eyebrow" id="page-eyebrow">Resumo do mes</p>
+        <h1 class="page-title" id="page-title">Dashboard</h1>
+    </div>
+    <p class="page-period"
+       id="page-period"
+       th:text="${#temporals.format(resumo.inicioMes, 'dd/MM/yyyy')} + ' – ' + ${#temporals.format(resumo.fimMes, 'dd/MM/yyyy')}">
+        01/05/2026 – 31/05/2026
+    </p>
+</header>
+=======
+<header class="page-header" th:fragment="header">
+    <div class="page-header-main">
+        <p class="eyebrow" id="page-eyebrow">Resumo do mes</p>
+        <h1 class="page-title" id="page-title">Dashboard</h1>
+    </div>
+    <p class="page-period"
+       id="page-period"
+       th:text="${#temporals.format(resumo.inicioMes, 'dd/MM/yyyy')} + ' – ' + ${#temporals.format(resumo.fimMes, 'dd/MM/yyyy')}">
+        01/05/2026 – 31/05/2026
+    </p>
+</header>
+>>>>>>> 6be877a264aef21474bf1ccbbf9c660e2ac5dcce

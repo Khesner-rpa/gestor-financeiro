@@ -1,0 +1,59 @@
+<<<<<<< HEAD
+<aside class="sidebar" aria-label="Menu principal" th:fragment="sidebar">
+    <button type="button" class="brand-button" data-menu-toggle aria-label="Abrir menu">
+        <span class="brand-mark" aria-hidden="true"></span>
+    </button>
+
+    <div class="side-menu">
+        <div class="side-menu-header">
+            <p class="side-menu-title">Gestor Financeiro</p>
+            <p class="side-menu-subtitle" th:text="${emailUsuario}">usuario@email.com</p>
+        </div>
+
+        <nav class="side-menu-list" aria-label="Navegacao">
+            <button type="button" class="menu-link is-active" data-open-panel="dashboard">Dashboard</button>
+            <button type="button" class="menu-link" data-open-panel="planejamento">Metas e graficos</button>
+            <button type="button" class="menu-link" data-open-panel="assistente">Assistente financeiro</button>
+            <button type="button" class="menu-link" data-open-panel="perfil">Perfil</button>
+            <button type="button" class="menu-link" data-open-panel="futuro">Pix, cripto e acoes</button>
+            <button type="button" class="menu-link" data-open-panel="seguranca">Seguranca</button>
+        </nav>
+
+        <div th:replace="~{fragments/dashboard/theme-switch :: themeSwitch}"></div>
+
+        <form th:action="@{/logout}" method="post" class="logout-form">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <button type="submit" class="danger-button">Sair</button>
+        </form>
+    </div>
+</aside>
+=======
+<aside class="sidebar" aria-label="Menu principal" th:fragment="sidebar">
+    <button type="button" class="brand-button" data-menu-toggle aria-label="Abrir menu">
+        <span class="brand-mark" aria-hidden="true"></span>
+    </button>
+
+    <div class="side-menu">
+        <div class="side-menu-header">
+            <p class="side-menu-title">Gestor Financeiro</p>
+            <p class="side-menu-subtitle" th:text="${emailUsuario}">usuario@email.com</p>
+        </div>
+
+        <nav class="side-menu-list" aria-label="Navegacao">
+            <button type="button" class="menu-link is-active" data-open-panel="dashboard">Dashboard</button>
+            <button type="button" class="menu-link" data-open-panel="planejamento">Metas e graficos</button>
+            <button type="button" class="menu-link" data-open-panel="assistente">Assistente financeiro</button>
+            <button type="button" class="menu-link" data-open-panel="perfil">Perfil</button>
+            <button type="button" class="menu-link" data-open-panel="futuro">Pix, cripto e acoes</button>
+            <button type="button" class="menu-link" data-open-panel="seguranca">Seguranca</button>
+        </nav>
+
+        <div th:replace="~{fragments/dashboard/theme-switch :: themeSwitch}"></div>
+
+        <form th:action="@{/logout}" method="post" class="logout-form">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <button type="submit" class="danger-button">Sair</button>
+        </form>
+    </div>
+</aside>
+>>>>>>> 6be877a264aef21474bf1ccbbf9c660e2ac5dcce

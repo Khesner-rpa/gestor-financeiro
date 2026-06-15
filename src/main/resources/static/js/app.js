@@ -84,7 +84,9 @@
         });
 
         bindOnce(root, "[data-pie-percent]", "boundPiePercent", (element) => {
+        window.setTimeout(() => {
             element.style.setProperty("--meta-percent", element.dataset.piePercent);
+        }, 50);
         });
     }
 

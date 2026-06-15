@@ -71,22 +71,6 @@
             });
         });
 
-        bindOnce(root, "[data-gasto-select]", "boundGastoSelect", (select) => {
-            select.addEventListener("change", () => {
-                const option = select.options[select.selectedIndex];
-                const display = document.querySelector("#categoria-display");
-                
-                if (select.value && display) {
-                    display.style.display = "flex";
-                    display.style.flexWrap = "wrap";
-                    display.querySelector(".cat-nome").textContent = option.text;
-                    display.querySelector(".cat-valor").textContent = "R$ " + option.dataset.valor + " (" + option.dataset.percentual + "%)";
-                    display.querySelector(".cat-barra").value = option.dataset.percentual;
-                    display.querySelector(".cat-barra").setAttribute("value", option.dataset.percentual);
-                }
-            });
-        });
-
         bindOnce(root, "[data-goal-toggle]", "boundGoalToggle", (button) => {
             button.addEventListener("click", () => {
                 const form = button.closest(".insight-card")?.querySelector("[data-goal-form]");

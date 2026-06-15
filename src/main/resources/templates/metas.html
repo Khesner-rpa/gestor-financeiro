@@ -14,7 +14,7 @@
 
             <div class="investment-pie-wrap">
                 <div class="investment-pie"
-                     th:style="'--meta-percent: ' + ${meta.percentual} + '%;'"
+                     th:style="'--meta-percent: ' + ${meta.percentual} + ';'"
                      role="img"
                      th:attr="aria-label=${'Grafico de investimentos com ' + meta.percentual + '% concluido'}">
                     <span th:text="${meta.percentual} + '%'">0%</span>
@@ -78,24 +78,13 @@
 
         <article class="insight-card card">
             <p class="section-title">Gastos por categoria</p>
-            <div th:if="${!#lists.isEmpty(categoriasResumo)}" style="display: flex; flex-direction: column; gap: 10px; margin-top: 1rem;">
-                <div id="categoria-display" class="category-row" style="display: flex; flex-wrap: wrap; align-items: center; padding-bottom: 0.5rem;">
-                    <strong class="cat-nome" style="flex: 1;" th:text="${categoriasResumo[0].nome}">Nome</strong>
-                    <span class="cat-valor" style="font-weight: 600;" th:text="'R$ ' + ${#numbers.formatDecimal(categoriasResumo[0].valor, 1, 'POINT', 2, 'COMMA')} + ' (' + ${categoriasResumo[0].percentual} + '%)'">R$ 0,00 (0%)</span>
-                    <progress class="cat-barra progress-native" th:value="${categoriasResumo[0].percentual}" max="100" style="width: 100%; margin-top: 0.75rem;"></progress>
+            <div th:if="${!#lists.isEmpty(categoriasResumo)}" class="category-list" style="margin-top: 1rem;">
+                <div class="category-row" th:each="categoria : ${categoriasResumo}">
+                    <strong th:text="${categoria.nome}">Nome</strong>
+                    <span class="category-amount"
+                          th:text="'R$ ' + ${#numbers.formatDecimal(categoria.valor, 1, 'POINT', 2, 'COMMA')} + ' (' + ${#numbers.formatDecimal(categoria.percentual, 1, 1, 'COMMA')} + '%)'">R$ 0,00 (0%)</span>
+                    <progress class="category-meter progress-native" th:value="${categoria.percentual}" max="100"></progress>
                 </div>
-
-                <label class="field" style="margin: 0;">
-                    <span class="field-hint" style="font-size: 12px; margin-bottom: 2px; display: block;">Selecione para analisar:</span>
-                    <select data-gasto-select style="cursor: pointer;">
-                        <option th:each="categoria, stat : ${categoriasResumo}" 
-                                th:value="${categoria.nome}" 
-                                th:data-valor="${#numbers.formatDecimal(categoria.valor, 1, 'POINT', 2, 'COMMA')}"
-                                th:data-percentual="${categoria.percentual}"
-                                th:selected="${stat.first}"
-                                th:text="${categoria.nome}"></option>
-                    </select>
-                </label>
             </div>
             <p class="section-subtitle" th:if="${#lists.isEmpty(categoriasResumo)}">Cadastre despesas para visualizar o mapa de gastos.</p>
         </article>

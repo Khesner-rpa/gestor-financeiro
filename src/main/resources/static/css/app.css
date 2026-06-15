@@ -25,6 +25,12 @@
     --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.45);
 }
 
+@property --meta-percent {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -945,7 +951,7 @@ tbody tr:hover {
     aspect-ratio: 1;
     border: 1px solid var(--border);
     border-radius: 50%;
-    background: conic-gradient(var(--accent) var(--meta-percent), var(--surface-soft) 0);
+    background: conic-gradient(var(--accent) calc(var(--meta-percent) * 1%), var(--surface-soft) 0);
     box-shadow: inset 0 0 0 18px var(--surface);
 }
 
@@ -1070,16 +1076,13 @@ tbody tr:hover {
 .category-meter {
     grid-column: 1 / -1;
     height: 8px;
-    overflow: hidden;
-    border-radius: 999px;
-    background: var(--surface-soft);
 }
 
-.category-meter span {
-    display: block;
-    height: 100%;
-    border-radius: inherit;
-    background: var(--accent);
+.category-amount {
+    text-align: right;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
 }
 
 .gemini-shell {

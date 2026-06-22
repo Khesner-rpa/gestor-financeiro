@@ -1,11 +1,20 @@
 <head th:fragment="head(titulo)" xmlns:th="http://www.thymeleaf.org">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf"        th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <title th:text="${titulo}">Gestor Financeiro</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}">
-    <script th:src="@{/js/app.js}" defer></script>
+
+    <!-- CSS modularizado -->
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/bot.css}">
+    <link rel="stylesheet" th:href="@{/css/responsive.css}">
+
+    <!-- JS modularizado (type="module" permite import/export entre arquivos) -->
+    <script type="module" th:src="@{/js/main.js}" defer></script>
 </head>
 
 <th:block th:fragment="scripts"></th:block>

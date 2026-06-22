@@ -83,7 +83,7 @@
                     <strong th:text="${categoria.nome}">Nome</strong>
                     <span class="category-amount"
                           th:text="'R$ ' + ${#numbers.formatDecimal(categoria.valor, 1, 'POINT', 2, 'COMMA')} + ' (' + ${#numbers.formatDecimal(categoria.percentual, 1, 1, 'COMMA')} + '%)'">R$ 0,00 (0%)</span>
-                    <progress class="category-meter progress-native" th:value="${categoria.percentual}" max="100"></progress>
+                    <progress class="category-meter progress-native" th:value="${#numbers.formatDecimal(categoria.percentual, 1, 1, 'POINT')}" max="100"></progress>
                 </div>
             </div>
             <p class="section-subtitle" th:if="${#lists.isEmpty(categoriasResumo)}">Cadastre despesas para visualizar o mapa de gastos.</p>

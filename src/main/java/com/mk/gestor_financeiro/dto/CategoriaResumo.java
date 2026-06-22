@@ -5,6 +5,6 @@ import java.math.BigDecimal;
 public record CategoriaResumo(
         String nome,
         BigDecimal valor,
-        int percentual
+        BigDecimal percentual
 ) {
 }

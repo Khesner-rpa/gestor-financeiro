@@ -273,15 +273,14 @@ public class TransacaoService {
                 ));
     }
 
-    private int calcularPercentual(BigDecimal valor, BigDecimal total) {
+    private BigDecimal calcularPercentual(BigDecimal valor, BigDecimal total) {
         if (total.compareTo(ZERO) == 0) {
-            return 0;
+            return ZERO;
         }
 
         return valor.multiply(BigDecimal.valueOf(100))
-                .divide(total, 0, RoundingMode.HALF_UP)
-                .min(BigDecimal.valueOf(100))
-                .intValue();
+                .divide(total, 1, RoundingMode.DOWN)
+                .min(BigDecimal.valueOf(100));
     }
 
     private int calcularAlturaBarra(BigDecimal valor, BigDecimal maiorValor) {

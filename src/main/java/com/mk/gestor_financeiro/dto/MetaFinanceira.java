@@ -6,7 +6,7 @@ public record MetaFinanceira(
         String nome,
         BigDecimal objetivo,
         BigDecimal acumulado,
-        int percentual,
+        BigDecimal percentual,
         BigDecimal restante
 ) {
 }

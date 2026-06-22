@@ -1,0 +1,82 @@
+@media (max-width: 980px) {
+    .app-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        top: auto;
+        left: auto;
+        width: auto;
+        height: auto;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+    }
+
+    .nav-stack {
+        display: none;
+    }
+
+    .side-menu {
+        top: auto;
+        right: 0;
+        bottom: 70px;
+        left: auto;
+    }
+
+    .hero-strip,
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-grid,
+    .insight-grid,
+    .future-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #panel-planejamento .insight-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .investment-pie-wrap {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+
+    .investment-legend {
+        width: 100%;
+    }
+
+    .bot-message,
+    .bot-message.user-message {
+        max-width: 92%;
+    }
+}
+
+@media (max-width: 760px) {
+    .auth-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-brand {
+        display: none;
+    }
+
+    .auth-card-wrap {
+        min-height: 100vh;
+    }
+
+    .page {
+        padding-bottom: 110px;
+    }
+
+    .extract-head,
+    .panel-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

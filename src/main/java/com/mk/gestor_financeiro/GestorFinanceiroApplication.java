@@ -10,11 +10,6 @@ import java.util.Properties;
 @SpringBootApplication
 public class GestorFinanceiroApplication {
 
-    // Guarda a escolha apenas na memoria da JVM atual.
-    // O DevTools reinicia com o mesmo processo, entao
-    // essa variavel sobrevive ao restart sem salvar nada em disco.
-    // Quando o usuario faz Ctrl+C e roda novamente, um novo
-    // processo e criado e a variavel volta a ser null.
     private static Properties cachedProps = null;
 
     public static void main(String[] args) {
@@ -36,16 +31,19 @@ public class GestorFinanceiroApplication {
         System.out.println("+--------------------------------------------------+");
         System.out.println();
         System.out.println("Onde deseja guardar os dados?");
-        System.out.println("  [1] Memoria (H2 - dados perdidos ao encerrar)");
-        System.out.println("  [2] Nuvem   (PostgreSQL - requer banco configurado)");
+        System.out.println("  [1] Memoria.............:  (H2 - dados perdidos ao encerrar)");
+        System.out.println("  [2] Nuvem...............:  (PostgreSQL - informar dados)");
+        System.out.println("  [3] Credenciais Salvas..:  (PostgreSQL - variaveis de ambiente)");
         System.out.println();
-        System.out.print("Digite 1 ou 2: ");
+        System.out.print("Digite 1, 2 ou 3: ");
         System.out.flush();
 
         String escolha = lerLinha();
 
         if ("2".equals(escolha)) {
-            configurarCloud(props);
+            configurarCloudManualmente(props);
+        } else if ("3".equals(escolha)) {
+            configurarCloudVariaveis(props);
         } else {
             if (!"1".equals(escolha)) {
                 System.out.println();
@@ -76,26 +74,8 @@ public class GestorFinanceiroApplication {
         props.setProperty("spring.h2.console.path", "/h2-console");
     }
 
-    private static void configurarCloud(Properties props) {
+    private static void configurarCloudManualmente(Properties props) {
         System.out.println();
-
-        String urlEnv      = System.getenv("DATABASE_URL");
-        String userEnv     = System.getenv("DATABASE_USERNAME");
-        String passwordEnv = System.getenv("DATABASE_PASSWORD");
-
-        boolean temCredenciais = urlEnv      != null && !urlEnv.isBlank()
-                              && userEnv     != null && !userEnv.isBlank()
-                              && passwordEnv != null && !passwordEnv.isBlank();
-
-        if (temCredenciais) {
-            System.out.println("[OK] Variaveis de ambiente detectadas.");
-            System.out.println("     DATABASE_URL: " + mascararUrl(urlEnv));
-            System.out.println();
-            aplicarPostgres(props, urlEnv, userEnv, passwordEnv);
-            return;
-        }
-
-        System.out.println("Nenhuma variavel de ambiente encontrada.");
         System.out.println("Informe os dados de conexao (Enter em branco cancela e usa memoria):");
         System.out.println();
 
@@ -128,6 +108,28 @@ public class GestorFinanceiroApplication {
         System.out.println();
 
         aplicarPostgres(props, url, user, password);
+    }
+
+    private static void configurarCloudVariaveis(Properties props) {
+        System.out.println();
+
+        String urlEnv      = System.getenv("DATABASE_URL");
+        String userEnv     = System.getenv("DATABASE_USERNAME");
+        String passwordEnv = System.getenv("DATABASE_PASSWORD");
+
+        boolean temCredenciais = urlEnv      != null && !urlEnv.isBlank()
+                              && userEnv     != null && !userEnv.isBlank()
+                              && passwordEnv != null && !passwordEnv.isBlank();
+
+        if (temCredenciais) {
+            System.out.println("[OK] Variaveis de ambiente detectadas.");
+            System.out.println("     DATABASE_URL: " + mascararUrl(urlEnv));
+            System.out.println();
+            aplicarPostgres(props, urlEnv, userEnv, passwordEnv);
+        } else {
+            System.out.println("[AVISO] Nenhuma variavel de ambiente encontrada. Usando memoria como fallback.");
+            configurarMemoria(props);
+        }
     }
 
     private static void aplicarPostgres(Properties props,

@@ -4,7 +4,7 @@ Um MVP (Mínimo Produto Viável) de um gestor financeiro pessoal, construído co
 
 **Acesse a versão online:** [https://gestor-financeiro-2lp9.onrender.com/login](https://gestor-financeiro-2lp9.onrender.com/login)
 
-## ✨ Principais Funcionalidades
+## Principais Funcionalidades
 
 *   **Dashboard Interativo:** Resumo mensal de receitas, despesas e saldo atual.
 *   **Gerenciamento de Transações:** CRUD completo para receitas e despesas.
@@ -14,7 +14,7 @@ Um MVP (Mínimo Produto Viável) de um gestor financeiro pessoal, construído co
 *   **Assistente Virtual (Client-side):** Um bot simples para responder a perguntas sobre suas finanças com base nos dados da página.
 *   **Tema Claro e Escuro:** Interface adaptável à preferência do usuário.
 
-## 🚀 Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 Este projeto integra tecnologias modernas para criar uma experiência de usuário fluida, mantendo a lógica principal no backend.
 
@@ -38,27 +38,14 @@ Este projeto integra tecnologias modernas para criar uma experiência de usuári
 - **Maven:** Gerenciador de dependências e build do projeto Java.
 - **Docker:** A aplicação pode ser containerizada para um deploy simplificado e consistente, conforme definido no `Dockerfile`.
 
-## 💻 Rodando o Projeto
+## 🚀 Rodando o Projeto
 
-### Localmente (com banco H2 em memória)
+### Configuração Interativa
 
-O perfil `local` é ativado por padrão ao rodar o comando abaixo. Ele utiliza um banco de dados H2 em memória e aplica as migrações do Flyway automaticamente. Os dados serão perdidos ao encerrar a aplicação.
+Você **não precisa** criar tabelas ou configurar o banco de dados manualmente. O projeto foi desenhado para ser fácil de iniciar. Ao executar a aplicação, um menu interativo aparecerá no console, permitindo que você escolha como os dados serão armazenados.
 
 ```powershell
-.\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=local
-```
-
-O perfil `local` usa H2 em memoria e aplica as migrations do Flyway automaticamente.
-
-## Banco PostgreSQL
-
-Configure as variaveis abaixo para usar PostgreSQL:
-
-```env
-DATABASE_URL=jdbc:postgresql://host:5432/gestor_financeiro
-DATABASE_USERNAME=usuario
-DATABASE_PASSWORD=senha
-PORT=8080
+.\mvnw.cmd spring-boot:run
 ```
 
 ## Organizacao

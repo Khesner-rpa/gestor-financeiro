@@ -12,7 +12,6 @@ Um MVP (Mínimo Produto Viável) de um gestor financeiro pessoal, construído co
 *   **Análise de Gastos:** Gráficos e listas que detalham os gastos por categoria.
 *   **Autenticação e Perfil:** Sistema de login seguro e gerenciamento de perfil de usuário.
 *   **Assistente Virtual (Client-side):** Um bot simples para responder a perguntas sobre suas finanças com base nos dados da página.
-*   **Tema Claro e Escuro:** Interface adaptável à preferência do usuário.
 
 ## Tecnologias Utilizadas
 
@@ -38,7 +37,7 @@ Este projeto integra tecnologias modernas para criar uma experiência de usuári
 - **Maven:** Gerenciador de dependências e build do projeto Java.
 - **Docker:** A aplicação pode ser containerizada para um deploy simplificado e consistente, conforme definido no `Dockerfile`.
 
-## 🚀 Rodando o Projeto
+## Rodando o Projeto
 
 ### Configuração Interativa
 

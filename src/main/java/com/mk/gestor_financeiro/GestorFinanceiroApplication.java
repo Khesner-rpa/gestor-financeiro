@@ -32,8 +32,8 @@ public class GestorFinanceiroApplication {
         System.out.println();
         System.out.println("Onde deseja guardar os dados?");
         System.out.println("  [1] Memoria.............:  (H2 - dados perdidos ao encerrar)");
-        System.out.println("  [2] Nuvem...............:  (PostgreSQL - informar dados)");
-        System.out.println("  [3] Credenciais Salvas..:  (PostgreSQL - variaveis de ambiente)");
+        System.out.println("  [2] Nuvem...............:  (PostgreSQL - informar credenciais)");
+        System.out.println("  [3] Usar ultima nuvem...:  (Reutiliza credenciais da execucao anterior)");
         System.out.println();
         System.out.print("Digite 1, 2 ou 3: ");
         System.out.flush();
@@ -43,7 +43,7 @@ public class GestorFinanceiroApplication {
         if ("2".equals(escolha)) {
             configurarCloudManualmente(props);
         } else if ("3".equals(escolha)) {
-            configurarCloudVariaveis(props);
+            configurarComCredenciaisSalvas(props);
         } else {
             if (!"1".equals(escolha)) {
                 System.out.println();
@@ -107,27 +107,47 @@ public class GestorFinanceiroApplication {
         System.out.println("[OK] Conectando ao banco PostgreSQL...");
         System.out.println();
 
+        // Salva as propriedades de sistema para serem reutilizadas pela opcao [3]
+        // em caso de restart do DevTools, onde a memoria estatica pode ser perdida.
+        System.setProperty("gestor_financeiro.db.url", url);
+        System.setProperty("gestor_financeiro.db.user", user);
+        System.setProperty("gestor_financeiro.db.password", password);
+
         aplicarPostgres(props, url, user, password);
     }
 
-    private static void configurarCloudVariaveis(Properties props) {
+    private static void configurarComCredenciaisSalvas(Properties props) {
         System.out.println();
 
-        String urlEnv      = System.getenv("DATABASE_URL");
-        String userEnv     = System.getenv("DATABASE_USERNAME");
+        // 1. Tenta usar as propriedades de sistema (salvas na execucao anterior com opcao [2])
+        String urlSys = System.getProperty("gestor_financeiro.db.url");
+        String userSys = System.getProperty("gestor_financeiro.db.user");
+        String passSys = System.getProperty("gestor_financeiro.db.password");
+
+        if (urlSys != null && !urlSys.isBlank()) {
+            System.out.println("[OK] Reutilizando credenciais da ultima execucao.");
+            System.out.println("     DATABASE_URL: " + mascararUrl(urlSys));
+            System.out.println();
+            aplicarPostgres(props, urlSys, userSys, passSys);
+            return;
+        }
+
+        // 2. Tenta usar as variaveis de ambiente (configuracao de producao)
+        String urlEnv = System.getenv("DATABASE_URL");
+        String userEnv = System.getenv("DATABASE_USERNAME");
         String passwordEnv = System.getenv("DATABASE_PASSWORD");
 
-        boolean temCredenciais = urlEnv      != null && !urlEnv.isBlank()
-                              && userEnv     != null && !userEnv.isBlank()
-                              && passwordEnv != null && !passwordEnv.isBlank();
+        boolean temCredenciaisEnv = urlEnv != null && !urlEnv.isBlank()
+                                  && userEnv != null && !userEnv.isBlank()
+                                  && passwordEnv != null && !passwordEnv.isBlank();
 
-        if (temCredenciais) {
+        if (temCredenciaisEnv) {
             System.out.println("[OK] Variaveis de ambiente detectadas.");
             System.out.println("     DATABASE_URL: " + mascararUrl(urlEnv));
             System.out.println();
             aplicarPostgres(props, urlEnv, userEnv, passwordEnv);
         } else {
-            System.out.println("[AVISO] Nenhuma variavel de ambiente encontrada. Usando memoria como fallback.");
+            System.out.println("[AVISO] Nenhuma credencial salva ou variavel de ambiente encontrada. Usando memoria como fallback.");
             configurarMemoria(props);
         }
     }

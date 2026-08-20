@@ -242,13 +242,15 @@ public class TransacaoService {
         Map<CategoriaTransacao, BigDecimal> despesasPorCategoria = new LinkedHashMap<>();
 
         for (CategoriaTransacao categoria : CategoriaTransacao.values()) {
-            if (categoria != CategoriaTransacao.INVESTIMENTOS) {
+            if (categoria != CategoriaTransacao.INVESTIMENTOS && categoria != CategoriaTransacao.SALARIO) {
                 despesasPorCategoria.put(categoria, ZERO);
             }
         }
 
         for (Transacao transacao : transacoesDoMes) {
-            if (transacao.getTipo() == TipoTransacao.DESPESA && transacao.getCategoria() != CategoriaTransacao.INVESTIMENTOS) {
+            if (transacao.getTipo() == TipoTransacao.DESPESA
+                    && transacao.getCategoria() != CategoriaTransacao.INVESTIMENTOS
+                    && transacao.getCategoria() != CategoriaTransacao.SALARIO) {
                 despesasPorCategoria.merge(transacao.getCategoria(), transacao.getValor(), BigDecimal::add);
             }
         }

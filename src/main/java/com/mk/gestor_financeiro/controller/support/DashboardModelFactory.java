@@ -123,6 +123,7 @@ public class DashboardModelFactory {
     private List<CategoriaTransacao> filtrarCategoriasDoFormulario() {
         return Arrays.stream(CategoriaTransacao.values())
                 .filter(categoria -> categoria != CategoriaTransacao.SALARIO)
+                .filter(categoria -> categoria != CategoriaTransacao.COMISSAO)
                 .toList();
     }
 }

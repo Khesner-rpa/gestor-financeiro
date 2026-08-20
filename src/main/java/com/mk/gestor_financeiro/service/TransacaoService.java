@@ -54,11 +54,41 @@ public class TransacaoService {
     }
 
     @Transactional(readOnly = true)
-    public DashboardResumo calcularResumoDoMes(String emailUsuario) {
+    public DashboardDados carregarDashboard(String emailUsuario, YearMonth mes) {
         Usuario usuario = usuarioService.buscarPorEmail(emailUsuario);
-        YearMonth mesAtual = YearMonth.now();
-        LocalDate inicioMes = mesAtual.atDay(1);
-        LocalDate fimMes = mesAtual.atEndOfMonth();
+        DashboardResumo resumo = calcularResumoDoMes(emailUsuario, mes);
+        List<Transacao> transacoesDoMes = listarTransacoesDoMes(emailUsuario, mes);
+
+        return new DashboardDados(
+                resumo,
+                calcularCategorias(transacoesDoMes, resumo.receitasMes()),
+                calcularEvolucao(emailUsuario, mes),
+                calcularMeta(usuario),
+                gerarInsight(resumo, transacoesDoMes)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<YearMonth> listarMesesComTransacoes(String emailUsuario) {
+        Usuario usuario = usuarioService.buscarPorEmail(emailUsuario);
+
+        return transacaoRepository.listarDatasDistintas(usuario.getId()).stream()
+                .map(YearMonth::from)
+                .distinct()
+                .sorted()
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public DashboardResumo calcularResumoDoMes(String emailUsuario) {
+        return calcularResumoDoMes(emailUsuario, YearMonth.now());
+    }
+
+    @Transactional(readOnly = true)
+    public DashboardResumo calcularResumoDoMes(String emailUsuario, YearMonth mes) {
+        Usuario usuario = usuarioService.buscarPorEmail(emailUsuario);
+        LocalDate inicioMes = mes.atDay(1);
+        LocalDate fimMes = mes.atEndOfMonth();
 
         BigDecimal receitasTotais = somar(usuario.getId(), TipoTransacao.RECEITA);
         BigDecimal despesasTotais = somar(usuario.getId(), TipoTransacao.DESPESA);
@@ -76,21 +106,29 @@ public class TransacaoService {
 
     @Transactional(readOnly = true)
     public List<Transacao> listarTransacoesDoMes(String emailUsuario) {
+        return listarTransacoesDoMes(emailUsuario, YearMonth.now());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Transacao> listarTransacoesDoMes(String emailUsuario, YearMonth mes) {
         Usuario usuario = usuarioService.buscarPorEmail(emailUsuario);
-        YearMonth mesAtual = YearMonth.now();
 
         return transacaoRepository.findByUsuarioIdAndDataBetweenOrderByDataDescIdDesc(
                 usuario.getId(),
-                mesAtual.atDay(1),
-                mesAtual.atEndOfMonth()
+                mes.atDay(1),
+                mes.atEndOfMonth()
         );
     }
 
     @Transactional(readOnly = true)
     public List<EvolucaoMensal> calcularEvolucao(String emailUsuario) {
+        return calcularEvolucao(emailUsuario, YearMonth.now());
+    }
+
+    @Transactional(readOnly = true)
+    public List<EvolucaoMensal> calcularEvolucao(String emailUsuario, YearMonth mesFinal) {
         Usuario usuario = usuarioService.buscarPorEmail(emailUsuario);
-        YearMonth mesInicial = YearMonth.now().minusMonths(5);
-        YearMonth mesFinal = YearMonth.now();
+        YearMonth mesInicial = mesFinal.minusMonths(5);
         LocalDate inicio = mesInicial.atDay(1);
         LocalDate fim = mesFinal.atEndOfMonth();
 
@@ -164,6 +202,9 @@ public class TransacaoService {
         Transacao transacao = buscarParaEdicao(emailUsuario, transacaoId);
         if (transacao.getCategoria() == CategoriaTransacao.INVESTIMENTOS) {
             throw new IllegalArgumentException("Nao e possivel editar movimentacoes da reserva.");
+        }
+        if (transacao.getCategoria() == CategoriaTransacao.SALARIO) {
+            throw new IllegalArgumentException("Nao e possivel editar o salario. Altere o valor no painel de salario.");
         }
         aplicarDados(transacao, form);
     }

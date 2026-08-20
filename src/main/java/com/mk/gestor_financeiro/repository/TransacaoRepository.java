@@ -1,5 +1,6 @@
 package com.mk.gestor_financeiro.repository;
 
+import com.mk.gestor_financeiro.model.CategoriaTransacao;
 import com.mk.gestor_financeiro.model.TipoTransacao;
 import com.mk.gestor_financeiro.model.Transacao;
 import java.math.BigDecimal;
@@ -18,6 +19,9 @@ public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
             LocalDate fim
     );
 
+    @Query("select distinct t.data from Transacao t where t.usuario.id = :usuarioId order by t.data")
+    List<LocalDate> listarDatasDistintas(@Param("usuarioId") Long usuarioId);
+
     List<Transacao> findByUsuarioIdAndDataBetweenOrderByDataAscIdAsc(
             Long usuarioId,
             LocalDate inicio,
@@ -25,6 +29,20 @@ public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
     );
 
     Optional<Transacao> findByIdAndUsuarioId(Long id, Long usuarioId);
+
+    @Query("""
+            select count(t.id) > 0
+            from Transacao t
+            where t.usuario.id = :usuarioId
+              and t.categoria = :categoria
+              and t.data between :inicio and :fim
+            """)
+    boolean existeTransacaoNoPeriodo(
+            @Param("usuarioId") Long usuarioId,
+            @Param("categoria") CategoriaTransacao categoria,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim
+    );
 
     @Query("""
             select sum(t.valor)

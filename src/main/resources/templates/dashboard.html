@@ -137,19 +137,102 @@
                                             <span class="bar bar-income" th:classappend="| bar-h-${item.alturaReceitas}|"></span>
                                             <span class="bar bar-expense" th:classappend="| bar-h-${item.alturaDespesas}|"></span>
                                         </div>
-                                        <span class="month-label" th:text="${item.mes}">mai</span>
+<span class="month-label" th:text="${item.mes}">mai</span>
+                                        </div>
+                                    </div>
+                                </article>
+
+                                <article class="card salary-card">
+                                    <div class="panel-head compact-head" style="flex-wrap: wrap; gap: 12px;">
+                                    <div>
+                                        <p class="section-title" th:text="${salario != null ? 'Atualizar salario' : 'Definir salario'}">Definir salario</p>
+                                        <p class="section-subtitle" th:if="${salario != null}">
+                                            Recebido todo dia <strong th:text="${salario.diaRecebimento}">5</strong>,
+                                            R$ <span th:text="${#numbers.formatDecimal(salario.valor, 1, 'POINT', 2, 'COMMA')}">0,00</span>
+                                            <span th:text="${salario.fixo} ? '(automatico)' : ''"></span>
+                                        </p>
+                                        <p class="section-subtitle" th:if="${salario == null}">Salario fixo cai todo mes no dia escolhido. Comissao e lancada manualmente.</p>
+                                    </div>
+                                </div>
+
+                                <div th:if="${erroSalario}" style="color: #ef4444; font-size: 0.875rem; font-weight: 500; padding: 0 20px 4px;" th:text="${erroSalario}"></div>
+
+                                <div class="field-stack" style="padding: 4px 20px 18px;">
+                                    <form hx-post="/salario/definir" hx-target="#dashboard-content" hx-swap="outerHTML" style="display: grid; gap: 12px;">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                        <div class="salary-row">
+                                            <label class="field" style="flex: 1; margin: 0;">
+                                                <span>Salario (R$)</span>
+                                                <input type="number" name="valor" min="0.01" step="0.01" required
+                                                       th:value="${salario != null ? salario.valor : ''}"
+                                                       placeholder="Ex: 3500">
+                                            </label>
+                                            <label class="field" style="flex: 0 0 130px; margin: 0;">
+                                                <span>Dia do recebimento</span>
+                                                <select name="dia" required>
+                                                    <option th:each="d : ${diasDoMes}" th:value="${d}"
+                                                            th:selected="${salario != null && d == salario.diaRecebimento}"
+                                                            th:text="${d}">5</option>
+                                                </select>
+                                            </label>
+                                        </div>
+                                        <label class="salary-fixed-check">
+                                            <input type="checkbox" name="fixo" value="true"
+                                                   th:checked="${salario == null || salario.fixo}">
+                                            <span class="salary-fixed-switch" aria-hidden="true"></span>
+                                            <span class="salary-fixed-label">
+                                                <strong>Salario fixo</strong>
+                                                <small th:if="${salario == null || salario.fixo}">Marcado: entra como receita todo mes no dia escolhido</small>
+                                                <small th:if="${salario != null && !salario.fixo}">Desmarcado: nao entra mais automaticamente, mas transacoes antigas ficam salvas</small>
+                                            </span>
+                                        </label>
+                                        <span class="salary-fixed-hint">
+                                            Desmarcar nao apaga as transacoes ja lancadas. Elas continuam no extrato e podem ser excluidas manualmente.
+                                        </span>
+                                        <button type="submit" class="primary-button" th:text="${salario != null ? 'Atualizar salario' : 'Salvar salario'}">Salvar salario</button>
+                                    </form>
+
+                                    <div style="margin-top: 4px; border-top: 1px solid var(--border-color, #e2e8f0); padding-top: 14px;">
+                                        <form hx-post="/salario/comissao" hx-target="#dashboard-content" hx-swap="outerHTML" style="display: flex; gap: 10px; align-items: end;">
+                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                            <label class="field" style="flex: 1; margin: 0;">
+                                                <span>Comissao do mes (R$)</span>
+                                                <input type="number" name="valor" min="0.01" step="0.01" required placeholder="Ex: 800">
+                                            </label>
+                                            <button type="submit" class="secondary-button" style="margin: 0; white-space: nowrap;">Adicionar comissao</button>
+                                        </form>
+                                        <p class="section-subtitle" style="margin-top: 6px;">A comissao varia todo mes, por isso e lancada manualmente quando chegar.</p>
                                     </div>
                                 </div>
                             </article>
-                        </div>
+                            </div>
 
-                        <section class="extract-card">
+                            <section class="extract-card">
                             <div class="extract-head">
                                 <div>
                                     <h2 class="section-title">Extrato do mes</h2>
                                     <p class="section-subtitle">Movimentacoes mais recentes primeiro.</p>
                                 </div>
-                                <span class="badge" th:text="${#lists.size(transacoes)} + ' itens'">0 itens</span>
+                                <div class="extract-filter">
+                                    <select name="ano"
+                                            id="filtro-ano"
+                                            class="field-select-sm"
+                                            aria-label="Selecionar ano">
+                                        <option th:each="ano : ${anosDisponiveis}"
+                                                th:value="${ano}"
+                                                th:selected="${ano == mesSelecionado.year}" th:text="${ano}">2026</option>
+                                    </select>
+                                    <select name="mes"
+                                            id="filtro-mes"
+                                            class="field-select-sm"
+                                            aria-label="Selecionar mes">
+                                        <option th:each="mes : ${mesesDoAnoSelecionado}"
+                                                th:value="${mes.mes}"
+                                                th:selected="${mes.mes == mesSelecionado.monthValue && mes.ano == mesSelecionado.year}"
+                                                th:text="${mes.nome}">agosto</option>
+                                    </select>
+                                    <span class="badge" th:text="${#lists.size(transacoes)} + ' itens'">0 itens</span>
+                                </div>
                             </div>
 
                             <div id="tabela-extrato" class="table-wrap extract-scroll">
@@ -182,7 +265,8 @@
                                                 R$ <span th:text="${#numbers.formatDecimal(transacao.valor, 1, 'POINT', 2, 'COMMA')}">0,00</span>
                                             </td>
                                             <td class="actions-cell">
-                                                <div class="row-actions" th:if="${transacao.categoria.name() != 'INVESTIMENTOS'}">
+                                                <div class="row-actions"
+                                                     th:if="${transacao.categoria.name() != 'INVESTIMENTOS' && transacao.categoria.name() != 'SALARIO'}">
                                                     <button type="button"
                                                             th:attr="hx-get=@{/transacoes/{id}/editar(id=${transacao.id})}"
                                                             hx-target="#form-transacao"
@@ -193,6 +277,22 @@
                                                         <span th:replace="~{fragments/icons :: edit}"></span>
                                                     </button>
 
+                                                    <form th:action="@{/transacoes/{id}/excluir(id=${transacao.id})}"
+                                                          th:attr="hx-post=@{/transacoes/{id}/excluir(id=${transacao.id})}"
+                                                          hx-target="#dashboard-content"
+                                                          hx-swap="outerHTML"
+                                                          method="post"
+                                                          class="inline-form"
+                                                          onsubmit="return confirm('Excluir esta transacao?');">
+                                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                                        <button type="submit" class="icon-button icon-button--delete" title="Excluir transacao" aria-label="Excluir transacao">
+                                                            <span th:replace="~{fragments/icons :: delete}"></span>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                                <div class="row-actions"
+                                                     th:if="${transacao.categoria.name() == 'SALARIO'}">
+                                                    <span class="badge" title="O salario e gerado automaticamente. Para alterar o valor, use o painel de salario.">Salario</span>
                                                     <form th:action="@{/transacoes/{id}/excluir(id=${transacao.id})}"
                                                           th:attr="hx-post=@{/transacoes/{id}/excluir(id=${transacao.id})}"
                                                           hx-target="#dashboard-content"

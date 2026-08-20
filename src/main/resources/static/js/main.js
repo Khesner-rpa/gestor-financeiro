@@ -17,6 +17,27 @@ document.addEventListener("click", (event) => {
     clickAjax(trigger);
 });
 
+document.addEventListener("change", (event) => {
+    const select = event.target.closest(".extract-filter select");
+    if (!select) return;
+
+    const filter = select.closest(".extract-filter");
+    if (!filter) return;
+
+    const mes = filter.querySelector("#filtro-mes")?.value || "";
+    const ano = filter.querySelector("#filtro-ano")?.value || "";
+
+    event.preventDefault();
+    clickAjax({
+        getAttribute: (name) => {
+            if (name === "hx-get")    return `/dashboard?mes=${mes}&ano=${ano}`;
+            if (name === "hx-target") return "#dashboard-content";
+            if (name === "hx-swap")   return "outerHTML";
+            return null;
+        }
+    });
+});
+
 document.addEventListener("DOMContentLoaded", () => {
     const isAuthPage  = document.body.classList.contains("auth-page");
     const savedTheme  = getSavedTheme();

@@ -8,6 +8,7 @@ public enum CategoriaTransacao {
     EDUCACAO("Educação"),
     LAZER("Lazer"),
     SALARIO("Salario"),
+    COMISSAO("Comissao"),
     INVESTIMENTOS("Investimentos"),
     OUTROS("Outros");
 

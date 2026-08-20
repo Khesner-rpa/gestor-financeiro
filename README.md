@@ -9,6 +9,7 @@ Um MVP (Mínimo Produto Viável) de um gestor financeiro pessoal, construído co
 *   **Dashboard Interativo:** Resumo mensal de receitas, despesas e saldo atual.
 *   **Gerenciamento de Transações:** CRUD completo para receitas e despesas.
 *   **Metas Financeiras:** Acompanhe o progresso da sua reserva de segurança.
+*   **Salário Fixo:** Defina o salário e o dia de recebimento; o valor é lançado automaticamente todo mês. Comissões são adicionadas manualmente.
 *   **Análise de Gastos:** Gráficos e listas que detalham os gastos por categoria.
 *   **Autenticação e Perfil:** Sistema de login seguro e gerenciamento de perfil de usuário.
 *   **Assistente Virtual (Client-side):** Um bot simples para responder a perguntas sobre suas finanças com base nos dados da página.
@@ -39,12 +40,20 @@ Este projeto integra tecnologias modernas para criar uma experiência de usuári
 
 ## Rodando o Projeto
 
-### Configuração Interativa
+### Configuração via Variáveis de Ambiente
 
-Você **não precisa** criar tabelas ou configurar o banco de dados manualmente. O projeto foi desenhado para ser fácil de iniciar. Ao executar a aplicação, um menu interativo aparecerá no console, permitindo que você escolha como os dados serão armazenados.
+O banco de dados é configurado automaticamente. As credenciais são lidas de variáveis de ambiente para não vazarem no GitHub (o arquivo `application.properties` está no `.gitignore`). Se as variáveis não forem definidas, são usados valores padrão seguros do ambiente de produção.
 
-```powershell
-.\mvnw.cmd spring-boot:run
+| Variável        | Padrão                          |
+|-----------------|---------------------------------|
+| `DB_URL`        | URL do banco PostgreSQL Neon    |
+| `DB_USERNAME`   | `neondb_owner`                  |
+| `DB_PASSWORD`   | senha do banco                  |
+| `DB_DRIVER`     | `org.postgresql.Driver`         |
+| `PORT`          | `8080`                          |
+
+```bash
+DB_URL="jdbc:postgresql://..." DB_USERNAME="..." DB_PASSWORD="..." ./mvnw spring-boot:run
 ```
 
 ## Organizacao

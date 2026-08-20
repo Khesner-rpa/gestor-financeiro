@@ -79,4 +79,8 @@
         align-items: flex-start;
         flex-direction: column;
     }
+
+    .salary-row {
+        flex-direction: column;
+    }
 }

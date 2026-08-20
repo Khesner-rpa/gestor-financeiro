@@ -146,8 +146,8 @@
 
 .salary-card {
     margin-top: 18px;
-    padding: 0 0 18px;
-    overflow: visible;
+    padding: 0;
+    overflow: hidden;
 }
 
 .salary-card .compact-head {
@@ -156,9 +156,49 @@
     border-bottom: 1px solid var(--border);
 }
 
+.salary-section {
+    padding: 18px 20px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.salary-section:last-child {
+    border-bottom: none;
+}
+
+.salary-section-title {
+    margin: 0 0 16px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.salary-error {
+    color: #ef4444;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 12px 20px 0;
+}
+
+.salary-form {
+    display: grid;
+    gap: 14px;
+}
+
 .salary-row {
     display: flex;
     gap: 12px;
+}
+
+.salary-field-grow {
+    flex: 1;
+    margin: 0;
+}
+
+.salary-field-day {
+    flex: 0 0 110px;
+    margin: 0;
 }
 
 .salary-fixed-check {
@@ -188,8 +228,8 @@
 .salary-fixed-switch {
     position: relative;
     flex-shrink: 0;
-    width: 42px;
-    height: 24px;
+    width: 40px;
+    height: 22px;
     border-radius: 999px;
     background: var(--border);
     transition: background 180ms ease;
@@ -200,8 +240,8 @@
     position: absolute;
     top: 3px;
     left: 3px;
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     background: var(--surface);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
@@ -230,6 +270,7 @@
     font-size: 14px;
     font-weight: 700;
     line-height: 1.3;
+    color: var(--text);
 }
 
 .salary-fixed-label small {
@@ -238,16 +279,11 @@
     line-height: 1.4;
 }
 
-.salary-fixed-hint {
-    display: block;
+.salary-note {
+    margin: 12px 0 0;
     color: var(--muted);
     font-size: 12px;
     line-height: 1.5;
-    padding: 0 2px;
-}
-
-.salary-fixed-check .salary-fixed-label strong {
-    color: var(--text);
 }
 
 .chart-card .compact-head {
